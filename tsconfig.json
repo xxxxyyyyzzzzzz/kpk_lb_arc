@@ -1,27 +1,363 @@
-{
-  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
-  "compilerOptions": {
-    "target": "ES2022",
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
 
-    /* Bundler mode */
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": false,
-    "noEmit": true,
+@custom-variant dark (&:is(.dark *));
 
-    /* Linting */
-    "skipLibCheck": true,
-    "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+/* =====================================================
+   КПК — Tactical HUD design system
+   Military-tactical surfaces, cyberpunk transitions.
+   All colors in oklch / hex tokens, used via Tailwind.
+   ===================================================== */
+
+@theme inline {
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Tactical HUD semantic */
+  --color-hud-amber: var(--hud-amber);
+  --color-hud-amber-glow: var(--hud-amber-glow);
+  --color-hud-cyan: var(--hud-cyan);
+  --color-hud-red: var(--hud-red);
+  --color-hud-green: var(--hud-green);
+  --color-hud-grid: var(--hud-grid);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+
+  /* Action point types (з app.py) */
+  --color-action-active: var(--action-active);
+  --color-action-attack: var(--action-attack);
+  --color-action-build: var(--action-build);
+
+  /* Mission classes */
+  --color-mission-attack: var(--mission-attack);
+  --color-mission-defense: var(--mission-defense);
+  --color-mission-loot: var(--mission-loot);
+  --color-mission-economy: var(--mission-economy);
+
+  --font-display: "Orbitron", "Rajdhani", sans-serif;
+  --font-mono: "JetBrains Mono", "Share Tech Mono", monospace;
+  --font-body: "Rajdhani", "Inter", sans-serif;
+}
+
+:root {
+  --background: oklch(0.16 0.012 240);
+  --foreground: oklch(0.92 0.02 90);
+  --card: oklch(0.20 0.014 235);
+  --card-foreground: oklch(0.92 0.02 90);
+  --popover: oklch(0.18 0.014 235);
+  --popover-foreground: oklch(0.92 0.02 90);
+  --primary: oklch(0.78 0.16 75);          /* amber */
+  --primary-foreground: oklch(0.15 0.01 240);
+  --secondary: oklch(0.28 0.018 230);
+  --secondary-foreground: oklch(0.92 0.02 90);
+  --muted: oklch(0.24 0.014 230);
+  --muted-foreground: oklch(0.68 0.02 95);
+  --accent: oklch(0.78 0.16 75);
+  --accent-foreground: oklch(0.15 0.01 240);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 90);
+  --border: oklch(0.36 0.02 90 / 40%);
+  --input: oklch(0.30 0.018 230);
+  --ring: oklch(0.78 0.16 75);
+
+  --hud-amber: #f5b840;
+  --hud-amber-glow: #ffd97a;
+  --hud-cyan: #6cf0ff;
+  --hud-red: #ff5a4a;
+  --hud-green: #6cff9c;
+  --hud-grid: rgba(245, 184, 64, 0.08);
+  --surface-1: #0d1117;
+  --surface-2: #141a22;
+  --surface-3: #1a222d;
+
+  --action-active: #778FDF;
+  --action-attack: #E66969;
+  --action-build: #69BE64;
+
+  --mission-attack: #E66969;
+  --mission-defense: #66ADFF;
+  --mission-loot: #F9FF9E;
+  --mission-economy: #A9FFAF;
+}
+
+.dark {
+  --background: oklch(0.16 0.012 240);
+  --foreground: oklch(0.92 0.02 90);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
   }
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: var(--surface-1);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  ::selection {
+    background: var(--hud-amber);
+    color: #000;
+  }
+}
+
+/* ============ Background grid + scanlines ============ */
+.hud-grid-bg {
+  background-color: var(--surface-1);
+  background-image:
+    linear-gradient(var(--hud-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hud-grid) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, rgba(245,184,64,0.10), transparent 60%);
+  background-size: 32px 32px, 32px 32px, 100% 100%;
+}
+.hud-scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.02) 0px,
+    rgba(255,255,255,0.02) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 50;
+  mix-blend-mode: overlay;
+}
+.hud-vignette::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%);
+  z-index: 49;
+}
+
+/* ============ Corner brackets — military panel ============ */
+.hud-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(245,184,64,0.04), transparent 30%),
+    var(--surface-2);
+  border: 1px solid rgba(245,184,64,0.25);
+}
+.hud-panel::before,
+.hud-panel::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--hud-amber);
+  border-style: solid;
+  border-width: 0;
+}
+.hud-panel::before {
+  top: -1px; left: -1px;
+  border-top-width: 2px; border-left-width: 2px;
+}
+.hud-panel::after {
+  bottom: -1px; right: -1px;
+  border-bottom-width: 2px; border-right-width: 2px;
+}
+.hud-panel-corners-4 {
+  position: relative;
+}
+.hud-panel-corners-4 > .corner {
+  position: absolute;
+  width: 12px; height: 12px;
+  border: 0 solid var(--hud-amber);
+  pointer-events: none;
+}
+.hud-panel-corners-4 > .corner.tl { top:-1px; left:-1px; border-top-width:2px; border-left-width:2px; }
+.hud-panel-corners-4 > .corner.tr { top:-1px; right:-1px; border-top-width:2px; border-right-width:2px; }
+.hud-panel-corners-4 > .corner.bl { bottom:-1px; left:-1px; border-bottom-width:2px; border-left-width:2px; }
+.hud-panel-corners-4 > .corner.br { bottom:-1px; right:-1px; border-bottom-width:2px; border-right-width:2px; }
+
+/* ============ Buttons ============ */
+.hud-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--hud-amber);
+  background: linear-gradient(180deg, rgba(245,184,64,0.08), rgba(245,184,64,0.02));
+  border: 1px solid rgba(245,184,64,0.45);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  overflow: hidden;
+}
+.hud-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(245,184,64,0.25), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+.hud-btn:hover:not(:disabled) {
+  border-color: var(--hud-amber);
+  box-shadow: 0 0 18px rgba(245,184,64,0.35), inset 0 0 12px rgba(245,184,64,0.1);
+  color: var(--hud-amber-glow);
+}
+.hud-btn:hover:not(:disabled)::before { transform: translateX(100%); }
+.hud-btn:active:not(:disabled) { transform: translateY(1px); }
+.hud-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.hud-btn-danger {
+  color: var(--hud-red);
+  border-color: rgba(255,90,74,0.5);
+  background: linear-gradient(180deg, rgba(255,90,74,0.10), rgba(255,90,74,0.02));
+}
+.hud-btn-danger:hover:not(:disabled) {
+  box-shadow: 0 0 18px rgba(255,90,74,0.35);
+  border-color: var(--hud-red);
+}
+.hud-btn-ghost {
+  color: var(--muted-foreground);
+  border-color: rgba(190,190,190,0.25);
+  background: transparent;
+}
+.hud-btn-ghost:hover:not(:disabled) {
+  color: var(--foreground);
+  border-color: rgba(190,190,190,0.6);
+  box-shadow: none;
+}
+
+/* ============ Inputs ============ */
+.hud-input {
+  width: 100%;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(245,184,64,0.3);
+  color: var(--foreground);
+  padding: 0.7rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  outline: none;
+  transition: all 0.18s ease;
+}
+.hud-input:focus {
+  border-color: var(--hud-amber);
+  box-shadow: 0 0 0 1px var(--hud-amber), inset 0 0 8px rgba(245,184,64,0.1);
+}
+
+/* ============ Screen transitions (cyberpunk) ============ */
+@keyframes hud-screen-in {
+  0%   { opacity: 0; filter: blur(8px) hue-rotate(20deg); transform: translateY(8px); clip-path: inset(0 0 100% 0); }
+  40%  { opacity: 1; filter: blur(0) hue-rotate(0); clip-path: inset(0); }
+  100% { opacity: 1; transform: translateY(0); clip-path: inset(0); }
+}
+.hud-screen-enter {
+  animation: hud-screen-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes hud-glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, 0); }
+  80% { transform: translate(1px, 1px); }
+}
+.hud-glitch { animation: hud-glitch 0.4s steps(2) both; }
+
+@keyframes hud-flicker {
+  0%, 100% { opacity: 1; }
+  10% { opacity: 0.85; }
+  20% { opacity: 1; }
+  30% { opacity: 0.9; }
+  70% { opacity: 1; }
+}
+.hud-flicker { animation: hud-flicker 3s infinite; }
+
+@keyframes hud-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+.hud-scanbar {
+  position: fixed;
+  left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(180deg, transparent, rgba(108,240,255,0.06), transparent);
+  pointer-events: none;
+  z-index: 51;
+  animation: hud-scan 6s linear infinite;
+}
+
+@keyframes hud-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,90,74,0.4); }
+  50% { box-shadow: 0 0 20px 4px rgba(255,90,74,0.15); }
+}
+.hud-pulse-red { animation: hud-pulse 1.2s ease-in-out infinite; }
+
+@keyframes hud-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.2; }
+}
+.hud-blink { animation: hud-blink 1s steps(2) infinite; }
+
+/* ============ Typography helpers ============ */
+.hud-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--hud-amber);
+}
+.hud-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.hud-mono { font-family: var(--font-mono); }
+
+/* ============ Scrollbar ============ */
+.hud-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.hud-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+.hud-scroll::-webkit-scrollbar-thumb { background: rgba(245,184,64,0.4); }
+.hud-scroll::-webkit-scrollbar-thumb:hover { background: var(--hud-amber); }
+
+/* ============ Mission card glow ============ */
+.mission-active-glow {
+  box-shadow: 0 0 0 1px var(--hud-green), 0 0 18px rgba(108,255,156,0.25);
+  border-color: var(--hud-green) !important;
 }
