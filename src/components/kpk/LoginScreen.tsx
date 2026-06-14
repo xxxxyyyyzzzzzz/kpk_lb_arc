@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import factionsJson from "@/data/factions.json";
 import { useKpk } from "@/lib/kpkStore";
 import { sfx } from "@/lib/sounds";
@@ -16,16 +16,24 @@ export function LoginScreen() {
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [taken, setTaken] = useState<string[]>([]);
+  const takenFactionsRef = useRef(takenFactions);
+  takenFactionsRef.current = takenFactions;
 
   // refresh taken factions when user types a 4-char code in join mode
   useEffect(() => {
-    if (mode !== "join") { setTaken([]); return; }
+    if (mode !== "join") { setTaken((prev) => (prev.length === 0 ? prev : [])); return; }
     const c = code.trim().toUpperCase();
-    if (c.length !== 4) { setTaken([]); return; }
+    if (c.length !== 4) { setTaken((prev) => (prev.length === 0 ? prev : [])); return; }
     let cancelled = false;
-    takenFactions(c).then((t) => { if (!cancelled) setTaken(t); });
+    takenFactionsRef.current(c).then((t) => {
+      if (cancelled) return;
+      setTaken((prev) => {
+        if (prev.length === t.length && prev.every((x, i) => x === t[i])) return prev;
+        return t;
+      });
+    });
     return () => { cancelled = true; };
-  }, [mode, code, takenFactions]);
+  }, [mode, code]);
 
   async function submit() {
     if (!nickname.trim()) { setErr("◂ Введіть нікнейм"); sfx.deny(); return; }
