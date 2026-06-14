@@ -1,114 +1,73 @@
-import { useState } from "react";
 import { ScreenShell } from "./ScreenShell";
-import { useKpk, fmtClock, fmtSession } from "@/lib/kpkStore";
-import { sfx } from "@/lib/sounds";
+import { FACTIONS } from "@/lib/kpkData";
+import { useKpk } from "@/lib/kpkStore";
 
-const BOTS = [
-  { name: "Мутанти", info: "Сова сидить. Лисиця їсть предмети. Ведмідь — до найближчої будівлі. Темна гонча — до пораненого. Лісовик/Болотник — на солдатів у траві. Криси — стадом до будівель. Демон руйнує будівлі. Псевдогігант атакує техніку. Король павуків — у центр." },
-  { name: "Зомбі", info: null },
-  { name: "Воля", info: "Збирає предмети, об'єднується з угрупуванням, разом ідуть на Обов'язок. Атакує — інші підтримують." },
-  { name: "Обов'язок", info: "Збирає предмети, об'єднується з угрупуванням, разом ідуть на Волю." },
-  { name: "Нанокс", info: "Збирає шматки мутантів. Йдуть до Псі-випромінювача. Троє в одному секторі починають будувати випромінювач." },
-  { name: "Транспорт Нанокс", info: "Йде до найближчого Нанокса. Без нього — за 2 раунди спавнить бійця." },
-];
-
-export function TimerScreen() {
-  const { user, round, turn, sessionSeconds, turnSeconds, turnRunning, toggleTurn, nextPlayer, ap, setAP } = useKpk();
-  const [openBot, setOpenBot] = useState<string | null>(null);
-  const ending = turnSeconds <= 30;
-
+export function ScoreScreen() {
+  const { user, totalScore, level1, level2, level3, currency, history } = useKpk();
+  const me = {
+    nickname: user?.nickname ?? "—",
+    faction: user?.faction ?? "",
+    total: totalScore,
+    l1: level1, l2: level2, l3: level3,
+  };
+  const top = [me];
   return (
-    <ScreenShell title="Таймер">
-      <div className="mx-auto max-w-2xl space-y-6">
-        <div className="text-center hud-mono text-xs text-[color:var(--muted-foreground)]">
-          Новина {round} / Хід {turn} з 4
-        </div>
-
-        <div className="hud-panel-corners-4 relative flex items-center justify-between border border-[color:var(--hud-amber)]/30 bg-[color:var(--surface-2)] px-4 py-3">
-          <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
-          <span className="hud-label">Загальний час сесії</span>
-          <span className="hud-mono text-lg tabular-nums text-[color:var(--hud-cyan)]">{fmtSession(sessionSeconds)}</span>
-        </div>
-
-        <div className="hud-panel-corners-4 relative border border-[color:var(--hud-amber)]/30 bg-[color:var(--surface-2)] p-6 text-center">
-          <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
-          <h3 className="hud-title text-base text-[color:var(--muted-foreground)] mb-2">Хід гравця / <span className="text-[color:var(--hud-amber-glow)]">{user?.nickname}</span></h3>
-          <div className={`hud-mono text-7xl sm:text-8xl tabular-nums tracking-wider my-4 ${ending ? "text-[color:var(--hud-red)] hud-pulse-red" : "text-[color:var(--hud-amber-glow)]"}`}>
-            {fmtClock(turnSeconds)}
-          </div>
-          <div className="flex justify-center gap-3 flex-wrap">
-            <button className="hud-btn min-w-[140px]" onClick={() => { sfx.click(); toggleTurn(); }}>
-              {turnRunning ? "❚❚ Пауза" : "▸ Старт"}
-            </button>
-            <button className="hud-btn hud-btn-ghost min-w-[180px]" onClick={nextPlayer}>↦ Наступний гравець</button>
+    <ScreenShell title="ЄБали">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h2 className="hud-title text-2xl text-[color:var(--hud-amber)] border border-[color:var(--hud-amber)]/40 inline-block px-3 py-1">ЄБАЛИ</h2>
+          <div className="hud-mono text-xs text-[color:var(--muted-foreground)]">
+            Валюта: <span className="text-[color:var(--hud-amber)]">{currency}</span> ⛁
           </div>
         </div>
 
-        {/* Action points */}
-        <div className="space-y-3">
-          <ApRow label="Активні дії" color="var(--action-active)" cur={ap.active} max={ap.activeMax}
-            onMinus={() => setAP("active", ap.active - 1)} onPlus={() => setAP("active", ap.active + 1)} />
-          <ApRow label="Атакуючі дії" color="var(--action-attack)" cur={ap.attack} max={ap.attackMax}
-            onMinus={() => setAP("attack", ap.attack - 1)} onPlus={() => setAP("attack", ap.attack + 1)} />
-          <ApRow label="Будівельні дії" color="var(--action-build)" cur={ap.build} max={ap.buildMax}
-            onMinus={() => setAP("build", ap.build - 1)} onPlus={() => setAP("build", ap.build + 1)} />
-        </div>
-
-        {/* Bot turn details */}
-        <div>
-          <div className="hud-label mb-2">// Хід ботів</div>
-          <div className="space-y-2">
-            {BOTS.map((b) => (
-              <div key={b.name} className="border border-[color:var(--hud-amber)]/20 bg-[color:var(--surface-2)]">
-                {b.info ? (
-                  <>
-                    <button
-                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-[color:var(--surface-3)] text-left"
-                      onClick={() => { sfx.click(); setOpenBot(openBot === b.name ? null : b.name); }}
-                    >
-                      <span className={`hud-mono text-[color:var(--hud-amber)] transition-transform inline-block ${openBot === b.name ? "rotate-90" : ""}`}>▸</span>
-                      <span className="hud-title text-sm">{b.name}</span>
-                    </button>
-                    {openBot === b.name && (
-                      <div className="px-4 py-3 hud-mono text-xs leading-relaxed text-[color:var(--muted-foreground)] border-t border-[color:var(--hud-amber)]/15 bg-black/30">
-                        {b.info}
+        <section>
+          <h3 className="hud-label mb-2">// Поточний оперативник</h3>
+          <div className="hud-panel-corners-4 relative border border-[color:var(--hud-amber)]/30 bg-[color:var(--surface-2)] p-3">
+            <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
+            <div className="divide-y divide-[color:var(--hud-amber)]/15">
+              {top.map((p, i) => {
+                const fc = FACTIONS[p.faction] ?? "#fff";
+                return (
+                  <div key={p.nickname} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2.5">
+                    <span className="hud-mono w-6 text-[color:var(--hud-amber)] text-sm">{String(i+1).padStart(2,"0")}</span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="hud-title text-sm truncate text-[color:var(--hud-green)]">{p.nickname}</span>
+                        <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: fc, boxShadow: `0 0 6px ${fc}` }} />
+                        <span className="hud-mono text-[0.65rem] text-[color:var(--muted-foreground)] truncate">{p.faction}</span>
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="px-4 py-2 hud-title text-sm text-[color:var(--muted-foreground)]">{b.name}</div>
-                )}
+                      <div className="hud-mono text-[0.65rem] text-[color:var(--muted-foreground)] tabular-nums">
+                        I {p.l1} · II {p.l2} · III {p.l3}
+                      </div>
+                    </div>
+                    <span className="hud-title text-xl tabular-nums text-[color:var(--hud-amber)]">{p.total}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 className="hud-label mb-2">// Історія балів</h3>
+          <div className="hud-panel-corners-4 relative border border-[color:var(--hud-amber)]/30 bg-[color:var(--surface-2)] p-3">
+            <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
+            {history.length === 0 && (
+              <div className="hud-mono text-xs text-[color:var(--muted-foreground)]">// Поки що пусто. Виконуй місії.</div>
+            )}
+            {history.map((h, i) => (
+              <div key={i} className="flex items-center justify-between border-b border-[color:var(--hud-amber)]/10 py-2 last:border-0">
+                <div className="min-w-0">
+                  <div className="hud-mono text-xs text-[color:var(--foreground)] truncate">{h.nickname}</div>
+                  <div className="hud-mono text-[0.65rem] text-[color:var(--muted-foreground)] truncate">{h.reason}</div>
+                </div>
+                <span className="hud-mono text-sm tabular-nums text-[color:var(--hud-green)]">+{h.reward}</span>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </ScreenShell>
-  );
-}
-
-function ApRow({ label, color, cur, max, onMinus, onPlus }: { label: string; color: string; cur: number; max: number; onMinus: () => void; onPlus: () => void }) {
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-1.5">
-        <span className="hud-title text-sm" style={{ color }}>{label}</span>
-        <span className="hud-mono text-sm tabular-nums">{cur} / {max}</span>
-      </div>
-      <div className="flex flex-wrap gap-1.5 p-2 border" style={{ borderColor: `${color}55` }}>
-        {Array.from({ length: max }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { sfx.click(); i < cur ? onMinus() : onPlus(); }}
-            className="h-6 w-6 border transition-all"
-            style={{
-              borderColor: i < cur ? color : `${color}55`,
-              background: i < cur ? color : "transparent",
-              boxShadow: i < cur ? `0 0 6px ${color}` : "none",
-            }}
-            data-hud-sound="hover"
-          />
-        ))}
-      </div>
-    </div>
   );
 }

@@ -1,30 +1,26 @@
-export function renderErrorPage(): string {
-  return `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>This page didn't load</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      body { font: 15px/1.5 system-ui, -apple-system, sans-serif; background: #fafafa; color: #111; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 1.5rem; }
-      .card { max-width: 28rem; width: 100%; text-align: center; padding: 2rem; }
-      h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
-      p { color: #4b5563; margin: 0 0 1.5rem; }
-      .actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-      a, button { padding: 0.5rem 1rem; border-radius: 0.375rem; font: inherit; cursor: pointer; text-decoration: none; border: 1px solid transparent; }
-      .primary { background: #111; color: #fff; }
-      .secondary { background: #fff; color: #111; border-color: #d1d5db; }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>This page didn't load</h1>
-      <p>Something went wrong on our end. You can try refreshing or head back home.</p>
-      <div class="actions">
-        <button class="primary" onclick="location.reload()">Try again</button>
-        <a class="secondary" href="/">Go home</a>
-      </div>
-    </div>
-  </body>
-</html>`;
+import process from "node:process";
+
+// Server-only config. The .server.ts suffix prevents Vite from bundling
+// this file into the client — values here never reach the browser.
+//
+// On Cloudflare Workers, env binds at REQUEST time. Module-scope reads
+// (e.g. `const x = process.env.X`) resolve to undefined — always read
+// process.env INSIDE a function or handler.
+//
+// When to use which env-access pattern:
+//   - .server.ts module (this file): server-only helpers reused across
+//     handlers. Wrap reads in a function so they run per-request.
+//   - inline process.env inside a createServerFn handler: one-off reads
+//     not reused elsewhere.
+//   - import.meta.env.VITE_FOO: PUBLIC config readable from both client
+//     and server (analytics IDs, public URLs). Define in .env with the
+//     VITE_ prefix. Never put secrets here — they ship to the browser.
+
+export function getServerConfig() {
+  return {
+    nodeEnv: process.env.NODE_ENV,
+    // Add server-only values here, e.g.:
+    //   databaseUrl: process.env.DATABASE_URL,
+    //   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+  };
 }

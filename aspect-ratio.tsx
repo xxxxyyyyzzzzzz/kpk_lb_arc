@@ -1,94 +1,51 @@
-import { ScreenShell } from "./ScreenShell";
-import { UPGRADES, UPGRADE_CATEGORIES, type UpgradeCategory, type UpgradeDef } from "@/lib/kpkData";
-import { useKpk } from "@/lib/kpkStore";
+import { type ReactNode } from "react";
+import { useKpk, fmtClock } from "@/lib/kpkStore";
+import { sfx } from "@/lib/sounds";
+import type { Screen } from "@/lib/kpkData";
 
-export function UpgradesScreen() {
-  const { upgradePoints, upgrades, level1, level2, level3, currency } = useKpk();
-  const purchased = upgrades.length;
+export function HudHeader({
+  title,
+  backTo = "main",
+  showTimer = true,
+}: { title: string; backTo?: Screen; showTimer?: boolean }) {
+  const { go, turnSeconds } = useKpk();
   return (
-    <ScreenShell title="Прокачки">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="hud-title text-xl text-[color:var(--hud-amber)] border border-[color:var(--hud-amber)]/40 inline-block px-3 py-1">ДЕРЕВО ПРОКАЧОК</h2>
-            <div className="mt-2 hud-mono text-xs text-[color:var(--muted-foreground)]">
-              Куплено: <span className="text-[color:var(--hud-amber)]">{purchased}</span>
-              <span className="mx-2">·</span>L1: <span className="text-[color:var(--mission-defense)]">{level1}</span>
-              <span className="mx-2">·</span>L2: <span className="text-[color:var(--mission-loot)]">{level2}</span>
-              <span className="mx-2">·</span>L3: <span className="text-[color:var(--mission-economy)]">{level3}</span>
-              <span className="mx-2">·</span>⛁ <span className="text-[color:var(--hud-amber)]">{currency}</span>
-            </div>
-          </div>
-          <div className="hud-panel-corners-4 relative border border-[color:var(--hud-cyan)]/40 px-4 py-2">
-            <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
-            <div className="hud-label text-[0.6rem] text-[color:var(--hud-cyan)]">// Сума балів</div>
-            <div className="hud-title text-2xl text-[color:var(--hud-cyan)]">{upgradePoints}</div>
-          </div>
-        </div>
-
-        <div className="space-y-5">
-          {UPGRADE_CATEGORIES.map((cat) => (
-            <Branch key={cat} cat={cat} />
-          ))}
-        </div>
+    <header className="flex items-center justify-between border-b border-[color:var(--hud-amber)]/30 bg-[color:var(--surface-2)]/80 px-3 py-2 sm:px-5 sm:py-3 backdrop-blur-sm">
+      <button
+        onClick={() => { sfx.back(); go(backTo); }}
+        className="hud-btn hud-btn-ghost !py-1.5 !px-3 text-[0.7rem]"
+      >
+        ◂ {backTo === "main" ? "Головна" : "Назад"}
+      </button>
+      <div className="hud-title text-[color:var(--hud-amber)] text-xs sm:text-sm tracking-[0.3em] truncate">
+        {title}
       </div>
-    </ScreenShell>
+      {showTimer ? (
+        <button onClick={() => { sfx.click(); go("timer"); }} className="hud-mono text-base sm:text-xl tabular-nums text-[color:var(--hud-amber-glow)] hud-flicker">
+          {fmtClock(turnSeconds)}
+        </button>
+      ) : <span className="w-16" />}
+    </header>
   );
 }
 
-function Branch({ cat }: { cat: UpgradeCategory }) {
-  const tiers = [1, 2, 3] as const;
-  const all = Object.values(UPGRADES);
+export function ScreenShell({ children, title, backTo }: { children: ReactNode; title: string; backTo?: Screen }) {
   return (
-    <div className="hud-panel-corners-4 relative border border-[color:var(--hud-amber)]/25 bg-[color:var(--surface-2)] p-3">
-      <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
-      <div className="grid grid-cols-[100px_1fr] items-start gap-4 sm:grid-cols-[120px_1fr]">
-        <div className="hud-title text-sm text-[color:var(--hud-amber)] border-r border-[color:var(--hud-amber)]/20 pr-3 py-2">{cat.toUpperCase()}</div>
-        <div className="flex items-stretch gap-3 overflow-x-auto hud-scroll pb-2">
-          {tiers.map((tier, i) => {
-            const nodes = all.filter((u) => u.category === cat && u.tier === tier);
-            return (
-              <div key={tier} className="flex items-center gap-3">
-                <div className="flex flex-col gap-2">
-                  {nodes.map((n) => <UpgradeNode key={n.id} u={n} />)}
-                </div>
-                {i < tiers.length - 1 && <div className="h-px w-6 shrink-0 bg-[color:var(--hud-amber)]/40" />}
-              </div>
-            );
-          })}
-        </div>
+    <div className="hud-screen-enter flex h-full w-full flex-col">
+      <HudHeader title={title} backTo={backTo} />
+      <div className="hud-scroll flex-1 overflow-y-auto px-3 py-4 sm:px-6 sm:py-6">
+        {children}
       </div>
     </div>
   );
 }
 
-function UpgradeNode({ u }: { u: UpgradeDef }) {
-  const { upgrades, canPurchase, purchaseUpgrade } = useKpk();
-  const isPurchased = upgrades.includes(u.id);
-  const check = isPurchased ? { ok: false, reason: "Куплено" } : canPurchase(u.id);
-  const state: "purchased" | "available" | "locked" =
-    isPurchased ? "purchased" : check.ok ? "available" : "locked";
-  const styles =
-    state === "purchased" ? "border-[color:var(--hud-green)] bg-[color:var(--hud-green)]/10 text-[color:var(--foreground)]" :
-    state === "available" ? "border-[color:var(--hud-amber)] bg-[color:var(--hud-amber)]/5 text-[color:var(--foreground)] cursor-pointer hover:shadow-[0_0_12px_rgba(245,184,64,0.4)] hover:-translate-y-0.5" :
-    "border-[color:var(--muted-foreground)]/30 bg-black/20 text-[color:var(--muted-foreground)]";
+export function StatChip({ label, value, color }: { label: string; value: ReactNode; color?: string }) {
   return (
-    <div
-      className={`relative w-[180px] border p-2 transition-all ${styles}`}
-      title={state === "locked" ? check.reason : state === "purchased" ? "Куплено" : "Купити"}
-      onClick={() => { if (state === "available") purchaseUpgrade(u.id); }}
-    >
-      {state === "purchased" && (
-        <span className="absolute -top-2 -right-2 hud-mono text-[0.6rem] bg-[color:var(--hud-green)] text-black px-1.5 py-0.5">✓</span>
-      )}
-      <p className="text-[0.75rem] leading-tight mb-2">{u.name}</p>
-      <div className="flex justify-between items-end">
-        <span className="hud-mono text-[0.6rem] text-[color:var(--hud-amber)]">T{u.tier}</span>
-        <span className={`hud-mono text-[0.65rem] ${state === "purchased" ? "line-through opacity-60" : ""}`}>◆ {u.cost}</span>
-      </div>
-      {state === "locked" && check.reason && (
-        <div className="mt-1 hud-mono text-[0.55rem] text-[color:var(--hud-red)]/80 leading-tight">{check.reason}</div>
-      )}
+    <div className="hud-panel-corners-4 relative border border-[color:var(--hud-amber)]/30 bg-[color:var(--surface-3)]/70 px-3 py-1.5 hud-mono text-xs">
+      <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
+      <span className="hud-label mr-2 text-[0.6rem]" style={{ color }}>{label}</span>
+      <span className="tabular-nums" style={{ color: color ?? "var(--foreground)" }}>{value}</span>
     </div>
   );
 }

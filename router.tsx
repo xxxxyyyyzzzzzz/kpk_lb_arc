@@ -1,32 +1,20 @@
-// Mission scoring formulas — ported 1:1 from missions_database.py / app.py.
-// Do not tweak: these define game balance.
-import { CURRENCY_COEFFICIENT } from "./constants";
+// Game constants — must match KPK_Server (app.py) 1:1. Do not tune.
+export const CURRENCY_COEFFICIENT = 0.33;
+export const TURN_DURATION_SECONDS = 420;
+export const TOTAL_NEWS_ROUNDS = 4;
+export const TURNS_PER_NEWS_ROUND = 4;
 
-const round1 = (n: number) => Math.round(n * 10) / 10;
+export const DEFAULT_ACTION_POINTS = { active: 7, attack: 5, build: 4 } as const;
 
-export function calculateMissionLevel(points: number): 0 | 1 | 2 | 3 {
-  if (points >= 1 && points <= 27) return 1;
-  if (points >= 28 && points <= 60) return 2;
-  if (points >= 61 && points <= 150) return 3;
-  return 0;
-}
+export const UPGRADE_TIER_LIMITS: Record<1 | 2 | 3, number> = { 1: 4, 2: 3, 3: 2 };
 
-export function mapRange(value: number, inMin: number, inMax: number, outMin: number, outMax: number) {
-  if (inMax === inMin) return outMin;
-  return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
-}
+export const MISSION_SLOT_COUNT = 6;
+// mission_level = (slot_index % 3) + 1
+export const slotLevel = (slotIndex: number): 1 | 2 | 3 =>
+  ((slotIndex % 3) + 1) as 1 | 2 | 3;
 
-export function calculateLevelRewardPoints(points: number, level: 1 | 2 | 3 | 0): number {
-  if (level === 1) return round1(mapRange(points, 1, 27, 0.3, 0.7));
-  if (level === 2) return round1(mapRange(points, 28, 60, 0.6, 0.9));
-  if (level === 3) return round1(mapRange(points, 61, 150, 1.0, 1.5));
-  return 0;
-}
+export const MISSION_CLASSES = ["Атака", "Захист", "Лут", "Економіка"] as const;
+export type MissionClass = (typeof MISSION_CLASSES)[number];
 
-export function calculateCurrencyReward(points: number): number {
-  return Math.ceil(points * CURRENCY_COEFFICIENT);
-}
-
-export function calculateMissionPoints(actionCoeff: number, objectCoeff: number, quantity: number): number {
-  return Math.floor(actionCoeff * objectCoeff * quantity);
-}
+export const UPGRADE_CATEGORIES = ["Захист", "Атака", "Лут", "Економіка", "Командування"] as const;
+export type UpgradeCategory = (typeof UPGRADE_CATEGORIES)[number];

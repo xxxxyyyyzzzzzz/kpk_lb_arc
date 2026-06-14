@@ -1,0 +1,94 @@
+// WebAudio-generated UI sounds — no asset downloads needed.
+// Tactical HUD: short clicks for press, soft beeps for hover, alarm for warnings.
+
+let ctx: AudioContext | null = null;
+let muted = false;
+let unlocked = false;
+
+function markUnlocked() {
+  unlocked = true;
+  if (ctx?.state === "suspended") {
+    ctx.resume().catch(() => {});
+  }
+}
+
+function getCtx(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  if (!unlocked) return null;
+  if (!ctx) {
+    try {
+      ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    } catch {
+      return null;
+    }
+  }
+  if (ctx?.state === "suspended") {
+    ctx.resume().catch(() => {});
+  }
+  return ctx;
+}
+
+type Tone = {
+  freq: number;
+  duration: number;
+  type?: OscillatorType;
+  gain?: number;
+  freqEnd?: number;
+};
+
+function play(tones: Tone[]) {
+  if (muted) return;
+  const c = getCtx();
+  if (!c) return;
+  const now = c.currentTime;
+  let t = now;
+  for (const tone of tones) {
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = tone.type ?? "square";
+    osc.frequency.setValueAtTime(tone.freq, t);
+    if (tone.freqEnd) {
+      osc.frequency.exponentialRampToValueAtTime(tone.freqEnd, t + tone.duration);
+    }
+    const peak = tone.gain ?? 0.06;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + tone.duration);
+    osc.connect(g).connect(c.destination);
+    osc.start(t);
+    osc.stop(t + tone.duration + 0.02);
+    t += tone.duration;
+  }
+}
+
+export const sfx = {
+  unlock() { markUnlocked(); },
+  setMuted(v: boolean) { muted = v; },
+  isMuted() { return muted; },
+  hover() { play([{ freq: 880, duration: 0.04, type: "sine", gain: 0.025 }]); },
+  click() { play([{ freq: 1200, duration: 0.05, type: "square", gain: 0.05 }, { freq: 600, duration: 0.04, type: "square", gain: 0.04 }]); },
+  back() { play([{ freq: 600, duration: 0.06, type: "triangle", gain: 0.05 }, { freq: 300, duration: 0.06, type: "triangle", gain: 0.04 }]); },
+  confirm() { play([{ freq: 700, duration: 0.06, type: "sine", gain: 0.06 }, { freq: 1100, duration: 0.08, type: "sine", gain: 0.06 }, { freq: 1400, duration: 0.1, type: "sine", gain: 0.05 }]); },
+  deny() { play([{ freq: 220, duration: 0.12, type: "sawtooth", gain: 0.08, freqEnd: 110 }]); },
+  notify() { play([{ freq: 1500, duration: 0.05, type: "sine", gain: 0.05 }, { freq: 1800, duration: 0.08, type: "sine", gain: 0.05 }]); },
+  alarm() { play([{ freq: 800, duration: 0.18, type: "square", gain: 0.08, freqEnd: 400 }, { freq: 800, duration: 0.18, type: "square", gain: 0.08, freqEnd: 400 }]); },
+  glitch() { play([{ freq: 1800, duration: 0.02, type: "square", gain: 0.04 }, { freq: 400, duration: 0.03, type: "square", gain: 0.04 }, { freq: 1200, duration: 0.02, type: "square", gain: 0.04 }]); },
+  tick() { play([{ freq: 2000, duration: 0.02, type: "square", gain: 0.03 }]); },
+};
+
+/** Attach global click/hover sounds to buttons with .hud-btn / [data-hud-sound] */
+export function installGlobalSfx() {
+  if (typeof document === "undefined") return;
+  const onPointerDown = (e: Event) => {
+    markUnlocked();
+    const el = (e.target as HTMLElement)?.closest?.(".hud-btn, [data-hud-sound='click']") as HTMLElement | null;
+    if (el && !(el as HTMLButtonElement).disabled) sfx.click();
+  };
+  const onPointerOver = (e: Event) => {
+    const el = (e.target as HTMLElement)?.closest?.(".hud-btn, [data-hud-sound='hover']") as HTMLElement | null;
+    if (el && !(el as HTMLButtonElement).disabled) sfx.hover();
+  };
+  document.addEventListener("pointerdown", onPointerDown, { passive: true });
+  document.addEventListener("pointerover", onPointerOver, { passive: true });
+  document.addEventListener("keydown", markUnlocked, { passive: true });
+}

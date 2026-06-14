@@ -1,22 +1,27 @@
 import * as React from "react";
+import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 
 import { cn } from "@/lib/utils";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
-    return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className,
-        )}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
-Input.displayName = "Input";
+const HoverCard = HoverCardPrimitive.Root;
 
-export { Input };
+const HoverCardTrigger = HoverCardPrimitive.Trigger;
+
+const HoverCardContent = React.forwardRef<
+  React.ElementRef<typeof HoverCardPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>
+>(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+  <HoverCardPrimitive.Content
+    ref={ref}
+    align={align}
+    sideOffset={sideOffset}
+    className={cn(
+      "z-50 w-64 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-(--radix-hover-card-content-transform-origin)",
+      className,
+    )}
+    {...props}
+  />
+));
+HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;
+
+export { HoverCard, HoverCardTrigger, HoverCardContent };

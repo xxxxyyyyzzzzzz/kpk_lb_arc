@@ -1,49 +1,51 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-const alertVariants = cva(
-  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
-  {
-    variants: {
-      variant: {
-        default: "bg-background text-foreground",
-        destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
+const Accordion = AccordionPrimitive.Root;
 
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-  <div ref={ref} role="alert" className={cn(alertVariants({ variant }), className)} {...props} />
-));
-Alert.displayName = "Alert";
-
-const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h5
-      ref={ref}
-      className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-      {...props}
-    />
-  ),
-);
-AlertTitle.displayName = "AlertTitle";
-
-const AlertDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
+const AccordionItem = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("text-sm [&_p]:leading-relaxed", className)} {...props} />
+  <AccordionPrimitive.Item ref={ref} className={cn("border-b", className)} {...props} />
 ));
-AlertDescription.displayName = "AlertDescription";
+AccordionItem.displayName = "AccordionItem";
 
-export { Alert, AlertTitle, AlertDescription };
+const AccordionTrigger = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex flex-1 items-center justify-between py-4 text-sm font-medium cursor-pointer transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+    </AccordionPrimitive.Trigger>
+  </AccordionPrimitive.Header>
+));
+AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
+
+const AccordionContent = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Content
+    ref={ref}
+    className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    {...props}
+  >
+    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+  </AccordionPrimitive.Content>
+));
+AccordionContent.displayName = AccordionPrimitive.Content.displayName;
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };

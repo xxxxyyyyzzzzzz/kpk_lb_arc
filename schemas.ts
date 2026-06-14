@@ -1,27 +1,22 @@
-// Captures the original Error out-of-band so server.ts can recover the stack
-// when h3 has already swallowed the throw into a generic 500 Response.
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
-let lastCapturedError: { error: unknown; at: number } | undefined;
-const TTL_MS = 5_000;
+import { getServerConfig } from "../config.server";
 
-function record(error: unknown) {
-  lastCapturedError = { error, at: Date.now() };
-}
+// Example createServerFn. Server-side handler invoked from the client:
+//   const result = await getGreeting({ data: { name: "Ada" } })
+// The .handler body runs server-only — imports used only inside it (like
+// .server.ts modules) are tree-shaken from the client bundle. Module-level
+// code here still ships to the client; for truly server-only helpers, put
+// them in a .server.ts file. Use this pattern instead of Supabase Edge
+// Functions for server logic.
 
-if (typeof globalThis.addEventListener === "function") {
-  globalThis.addEventListener("error", (event) => record((event as ErrorEvent).error ?? event));
-  globalThis.addEventListener("unhandledrejection", (event) =>
-    record((event as PromiseRejectionEvent).reason),
-  );
-}
-
-export function consumeLastCapturedError(): unknown {
-  if (!lastCapturedError) return undefined;
-  if (Date.now() - lastCapturedError.at > TTL_MS) {
-    lastCapturedError = undefined;
-    return undefined;
-  }
-  const { error } = lastCapturedError;
-  lastCapturedError = undefined;
-  return error;
-}
+export const getGreeting = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ name: z.string().min(1) }))
+  .handler(async ({ data }) => {
+    const config = getServerConfig();
+    return {
+      greeting: `Hello, ${data.name}!`,
+      mode: config.nodeEnv ?? "unknown",
+    };
+  });

@@ -1,6 +1,8 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+node_modules
+dist
+.output
+.vinxi
+pnpm-lock.yaml
+package-lock.json
+bun.lock
+routeTree.gen.ts

@@ -1,37 +1,57 @@
 {
-  "zakhyst_1_1": {"name": "-1 крок, -1 дальність атаки на підконтрольних секторах", "category": "Захист", "tier": 1, "cost": 1},
-  "zakhyst_1_2": {"name": "+1 шкода на підконтрольних секторах всім типам атак", "category": "Захист", "tier": 1, "cost": 1},
-  "zakhyst_2_1": {"name": "Будівництво турелей на підконтрольних секторах", "category": "Захист", "tier": 2, "cost": 1},
-  "zakhyst_2_2": {"name": "+2 броні всьому (техніка лише угрупування)", "category": "Захист", "tier": 2, "cost": 1},
-  "zakhyst_3_1": {"name": "Захист від 'кровинок'", "category": "Захист", "tier": 3, "cost": 1},
-  "zakhyst_3_2": {"name": "Овервотч всім стрільцям", "category": "Захист", "tier": 3, "cost": 1},
-
-  "ataka_1_1": {"name": "+2 шкоди тільки для персонажів", "category": "Атака", "tier": 1, "cost": 1},
-  "ataka_1_2": {"name": "+1 дальність тільки для персонажів", "category": "Атака", "tier": 1, "cost": 1},
-  "ataka_2_1": {"name": "+2 ліміт техніки", "category": "Атака", "tier": 2, "cost": 1},
-  "ataka_2_2": {"name": "'Кровинка' всім", "category": "Атака", "tier": 2, "cost": 1},
-  "ataka_3_1": {"name": "Додаткова атака для персонажів (1 раз за раунд)", "category": "Атака", "tier": 3, "cost": 1},
-  "ataka_3_2": {"name": "Бронелом для стрільців", "category": "Атака", "tier": 3, "cost": 1},
-
-  "lut_1_1": {"name": "+3 шкоди по мутантах", "category": "Лут", "tier": 1, "cost": 1},
-  "lut_1_2": {"name": "На підконтрольних секторах +1 крок", "category": "Лут", "tier": 1, "cost": 1},
-  "lut_2_1": {"name": "Збільшений крок та карман", "category": "Лут", "tier": 2, "cost": 1},
-  "lut_2_2": {"name": "Маскування 3", "category": "Лут", "tier": 2, "cost": 1},
-  "lut_3_1": {"name": "Лут не згорає та одразу з підконтрольних секторів ТП на склад", "category": "Лут", "tier": 3, "cost": 1},
-  "lut_3_2": {"name": "+1 лут з усього", "category": "Лут", "tier": 3, "cost": 1},
-
-  "ekonomika_1_1": {"name": "Нескінченна конвертація заліза", "category": "Економіка", "tier": 1, "cost": 1},
-  "ekonomika_1_2": {"name": "Збільшені ліміти: 40 валюти, 15 металу", "category": "Економіка", "tier": 1, "cost": 1},
-  "ekonomika_2_1": {"name": "+1 монета за підконтрольний сектор", "category": "Економіка", "tier": 2, "cost": 1},
-  "ekonomika_2_2": {"name": "Оплата 3 монети за 1 рівень Мутанта та за персонажа", "category": "Економіка", "tier": 2, "cost": 1},
-  "ekonomika_3_1": {"name": "Конвертація грошей в бали 1:1", "category": "Економіка", "tier": 3, "cost": 1},
-  "ekonomika_3_2": {"name": "Покупка поінтів на місії", "category": "Економіка", "tier": 3, "cost": 1},
-
-  "komanduvannya_1_1": {"name": "2 рероли колоди (заміни місій)", "category": "Командування", "tier": 1, "cost": 0},
-  "komanduvannya_1_2": {"name": "Без оплати найманців", "category": "Командування", "tier": 1, "cost": 0},
-  "komanduvannya_2_1": {"name": "Додаткова атакуюча дія", "category": "Командування", "tier": 2, "cost": 0},
-  "komanduvannya_2_2": {"name": "Додатковий командний поінт", "category": "Командування", "tier": 2, "cost": 0},
-  "komanduvannya_2_3": {"name": "Додатковий бал дій", "category": "Командування", "tier": 3, "cost": 0},
-  "komanduvannya_3_1": {"name": "Артилерійський обстріл за раунд", "category": "Командування", "tier": 3, "cost": 0},
-  "komanduvannya_3_2": {"name": "3 атаки (всім окрім 1-го та 2-го ходу)", "category": "Командування", "tier": 3, "cost": 0}
+  "grid_size": 25,
+  "excluded_zones": ["A1:E5", "U1:Y5", "A21:E25", "U21:Y25"],
+  "zones_5x5": ["F1:T5", "U6:Y20", "F21:T25", "A6:E20"],
+  "zones_3x3": ["F6:O10", "P6:T15", "K16:T20", "F11:J20"],
+  "zones_1x1": ["K11:O15"],
+  "rules": {
+    "1": {
+      "Мутанти 1": {"quantity": "8-16", "zone": "5x5", "chance": 100},
+      "Мутанти 2": {"quantity": "4-8", "zone": "3x3", "chance": 100},
+      "Мутанти 3": {"quantity": "1-2", "zone": "1x1", "chance": 66},
+      "Нанокс": {"quantity": "2-4", "zone": "any", "chance": 25},
+      "Воля": {"quantity": "3-5", "zone": "any", "chance": 50},
+      "Обовʼязок": {"quantity": "3-5", "zone": "any", "chance": 50},
+      "Псі-випромінювач": {"quantity": "1", "zone": "3x3", "chance": 33},
+      "Аномалії": {"quantity": "1-3", "zone": "any", "chance": 100},
+      "Викид": {"chance": 50},
+      "Транспорт нанокс": {"quantity": "0", "zone": "any", "chance": 0}
+    },
+    "2": {
+      "Мутанти 1": {"quantity": "4-12", "zone": "5x5", "chance": 100},
+      "Мутанти 2": {"quantity": "8-12", "zone": "5x5", "chance": 100},
+      "Мутанти 3": {"quantity": "1-4", "zone": "3x3", "chance": 100},
+      "Нанокс": {"quantity": "2-8", "zone": "any", "chance": 50},
+      "Воля": {"quantity": "3-5", "zone": "any", "chance": 75},
+      "Обовʼязок": {"quantity": "3-5", "zone": "any", "chance": 75},
+      "Псі-випромінювач": {"quantity": "1", "zone": "3x3", "chance": 50},
+      "Аномалії": {"quantity": "2-4", "zone": "any", "chance": 100},
+      "Викид": {"chance": 50},
+      "Транспорт нанокс": {"quantity": "1-3", "zone": "any", "chance": 33}
+    },
+    "3": {
+      "Мутанти 1": {"quantity": "4-12", "zone": "5x5", "chance": 100},
+      "Мутанти 2": {"quantity": "8-12", "zone": "5x5", "chance": 100},
+      "Мутанти 3": {"quantity": "1-4", "zone": "3x3", "chance": 100},
+      "Нанокс": {"quantity": "2-8", "zone": "any", "chance": 50},
+      "Воля": {"quantity": "3-5", "zone": "any", "chance": 75},
+      "Обовʼязок": {"quantity": "3-5", "zone": "any", "chance": 75},
+      "Псі-випромінювач": {"quantity": "2", "zone": "3x3", "chance": 50},
+      "Аномалії": {"quantity": "2-4", "zone": "any", "chance": 100},
+      "Викид": {"chance": 50},
+      "Транспорт нанокс": {"quantity": "1-3", "zone": "any", "chance": 33}
+    },
+    "4": {
+      "Мутанти 1": {"quantity": "0", "zone": "5x5", "chance": 0},
+      "Мутанти 2": {"quantity": "8-16", "zone": "5x5", "chance": 100},
+      "Мутанти 3": {"quantity": "4-8", "zone": "3x3", "chance": 100},
+      "Нанокс": {"quantity": "4-6", "zone": "any", "chance": 100},
+      "Воля": {"quantity": "2-5", "zone": "any", "chance": 40},
+      "Обовʼязок": {"quantity": "2-4", "zone": "any", "chance": 40},
+      "Псі-випромінювач": {"quantity": "1", "zone": "3x3", "chance": 50},
+      "Аномалії": {"quantity": "3-6", "zone": "any", "chance": 100},
+      "Викид": {"chance": 50},
+      "Транспорт нанокс": {"quantity": "1-3", "zone": "any", "chance": 66}
+    }
+  }
 }

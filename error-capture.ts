@@ -1,21 +1,23 @@
 [
-  { "id": "z11", "name": "Зменшити крок ворогу на підконтрольних секторах", "description": "-1 крок, -1 дальність атаки супротивнику на ваших секторах", "category": "Захист", "tier": 1, "cost": 1 },
-  { "id": "z12", "name": "Бонус шкоди на своїй землі", "description": "+1 шкода на підконтрольних секторах", "category": "Захист", "tier": 1, "cost": 1 },
-  { "id": "z21", "name": "Турелі", "description": "Можливість будувати турелі на підконтрольних секторах", "category": "Захист", "tier": 2, "cost": 1, "requires": ["z11"] },
-  { "id": "z22", "name": "Броня угрупування", "description": "+2 броні всій техніці угрупування", "category": "Захист", "tier": 2, "cost": 1, "requires": ["z12"] },
+  { "id": 101, "name": "Побудувати Окоп ×3", "cls": "Захист", "tier": 1, "target": 3, "estimatedSeconds": 180, "reward": { "points": 6 } },
+  { "id": 102, "name": "Купити Предмет магазину ×4", "cls": "Економіка", "tier": 1, "target": 4, "estimatedSeconds": 180, "reward": { "points": 8, "currency": 2 } },
+  { "id": 103, "name": "Зібрати лут із сектора ×3", "cls": "Лут", "tier": 1, "target": 3, "estimatedSeconds": 200, "reward": { "points": 7 } },
+  { "id": 104, "name": "Поранити стрільця супротивника", "cls": "Атака", "tier": 1, "target": 1, "estimatedSeconds": 150, "reward": { "points": 5 } },
+  { "id": 105, "name": "Захопити нейтральний сектор", "cls": "Захист", "tier": 1, "target": 1, "estimatedSeconds": 180, "reward": { "points": 6 } },
+  { "id": 106, "name": "Найняти бійця у таверні", "cls": "Економіка", "tier": 1, "target": 1, "estimatedSeconds": 120, "reward": { "points": 5, "currency": 1 } },
+  { "id": 107, "name": "Відкрити схрон", "cls": "Лут", "tier": 1, "target": 1, "estimatedSeconds": 150, "reward": { "points": 6 } },
 
-  { "id": "a11", "name": "Посилення стрільців", "description": "+1 шкода всім стрільцям", "category": "Атака", "tier": 1, "cost": 1 },
-  { "id": "a12", "name": "Дальні гранати", "description": "+1 дальність гранатам", "category": "Атака", "tier": 1, "cost": 1 },
-  { "id": "a21", "name": "Подвійний постріл артилерії", "description": "Артилерія стріляє двічі за хід", "category": "Атака", "tier": 2, "cost": 1, "requires": ["a11"] },
-  { "id": "a22", "name": "Овервотч", "description": "Овервотч всім стрільцям", "category": "Атака", "tier": 2, "cost": 1, "requires": ["a12"] },
+  { "id": 201, "name": "Вбити NPC ×2", "cls": "Атака", "tier": 2, "target": 2, "estimatedSeconds": 300, "reward": { "points": 12 } },
+  { "id": 202, "name": "Захопити сектори ×4", "cls": "Захист", "tier": 2, "target": 4, "estimatedSeconds": 360, "reward": { "points": 10 } },
+  { "id": 203, "name": "Знайти артефакт у Зоні", "cls": "Лут", "tier": 2, "target": 1, "estimatedSeconds": 300, "reward": { "points": 14 } },
+  { "id": 204, "name": "Налагодити торгівлю з фракцією", "cls": "Економіка", "tier": 2, "target": 1, "estimatedSeconds": 240, "reward": { "points": 10, "currency": 3 } },
+  { "id": 205, "name": "Знищити техніку супротивника", "cls": "Атака", "tier": 2, "target": 1, "estimatedSeconds": 300, "reward": { "points": 14 } },
+  { "id": 206, "name": "Побудувати турель", "cls": "Захист", "tier": 2, "target": 1, "estimatedSeconds": 240, "reward": { "points": 12 } },
 
-  { "id": "e11", "name": "Дохід за хід", "description": "+1 валюта за хід", "category": "Економіка", "tier": 1, "cost": 1 },
-  { "id": "e12", "name": "Знижка на ринку", "description": "-1 ціна на ринку", "category": "Економіка", "tier": 1, "cost": 1 },
-  { "id": "e21", "name": "Подвійний ринок", "description": "Двічі купуйте на ринку за хід", "category": "Економіка", "tier": 2, "cost": 1, "requires": ["e11"] },
-  { "id": "e22", "name": "Дешеві найманці", "description": "Найманці коштують -1 валюта", "category": "Економіка", "tier": 2, "cost": 1, "requires": ["e12"] },
-
-  { "id": "l11", "name": "+1 предмет на сектор", "description": "Кожен сектор містить +1 предмет лута", "category": "Лут", "tier": 1, "cost": 1 },
-  { "id": "l12", "name": "Подвійний лут від мутантів", "description": "Удвічі більше лута з мутантів", "category": "Лут", "tier": 1, "cost": 1 },
-  { "id": "l21", "name": "Спецзнахідка від NPC", "description": "Шанс отримати спецпредмет від NPC", "category": "Лут", "tier": 2, "cost": 1, "requires": ["l11"] },
-  { "id": "l22", "name": "Розкривати схрони", "description": "Можливість знаходити приховані схрони", "category": "Лут", "tier": 2, "cost": 1, "requires": ["l12"] }
+  { "id": 301, "name": "Перехопити Точку", "cls": "Атака", "tier": 3, "target": 1, "estimatedSeconds": 420, "reward": { "points": 30 } },
+  { "id": 302, "name": "Налагодити стосунки з NPC ×2", "cls": "Економіка", "tier": 3, "target": 2, "estimatedSeconds": 480, "reward": { "points": 24, "currency": 4 } },
+  { "id": 303, "name": "Утримати столицю 2 ходи", "cls": "Захист", "tier": 3, "target": 2, "estimatedSeconds": 600, "reward": { "points": 28 } },
+  { "id": 304, "name": "Винести унікальний артефакт", "cls": "Лут", "tier": 3, "target": 1, "estimatedSeconds": 420, "reward": { "points": 30 } },
+  { "id": 305, "name": "Розбити основні сили фракції", "cls": "Атака", "tier": 3, "target": 1, "estimatedSeconds": 600, "reward": { "points": 35 } },
+  { "id": 306, "name": "Підпорядкувати NPC-загін", "cls": "Економіка", "tier": 3, "target": 1, "estimatedSeconds": 480, "reward": { "points": 26 } }
 ]

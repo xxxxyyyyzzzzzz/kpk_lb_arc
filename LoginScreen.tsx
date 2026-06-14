@@ -1,10 +1,42 @@
-// Run: bun scripts/generate-missions.ts
-// Reads src/data/mission_recipes.json → writes src/data/generated_missions.json
-import { writeFileSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { generateMissions, type Recipe } from "../src/lib/game/generateMissions";
+name: Deploy to Firebase Hosting
 
-const recipes = JSON.parse(readFileSync(resolve("src/data/mission_recipes.json"), "utf8")) as Recipe[];
-const missions = generateMissions(recipes);
-writeFileSync(resolve("src/data/generated_missions.json"), JSON.stringify(missions, null, 2) + "\n");
-console.log(`Generated ${missions.length} missions → src/data/generated_missions.json`);
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build static site
+        run: bun run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_DATABASE_URL: ${{ secrets.VITE_FIREBASE_DATABASE_URL }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      - name: Write service account key
+        run: echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}' > gcp-key.json
+
+      - name: Deploy to Firebase Hosting
+        uses: w9jds/firebase-action@v14.18.0
+        with:
+          args: deploy --only hosting --project kpk-1-caa5a
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /github/workspace/gcp-key.json
