@@ -494,7 +494,7 @@ export function KpkProvider({ children }: { children: ReactNode }) {
   const value: KpkState = useMemo(() => ({
     screen, prevScreen, user,
     totalScore, level1, level2, level3, currency, currencyEarnedThisTurn,
-    round, turn, sessionSeconds, turnSeconds, turnRunning,
+    round, turn, turnSeconds, turnRunning,
     ap, replacements,
     slots, completedIds, missionsByLevel, allMissions, getMission,
     upgrades: upgradesList, upgradePoints, canPurchase, purchaseUpgrade,
@@ -526,14 +526,36 @@ export function KpkProvider({ children }: { children: ReactNode }) {
     replaceSlot,
   }), [
     screen, prevScreen, user, totalScore, level1, level2, level3, currency, currencyEarnedThisTurn,
-    round, turn, sessionSeconds, turnSeconds, turnRunning, ap, replacements,
+    round, turn, turnSeconds, turnRunning, ap, replacements,
     slots, completedIds, missionsByLevel, allMissions, getMission,
     upgradesList, upgradePoints, canPurchase, purchaseUpgrade, news, history,
     roomCode, playerId, isHost, players, takenFactions, createGame, joinGame,
     nextPlayer, updateSlotProgress, completeSlot, replaceSlot,
   ]);
 
-  return <KpkContext.Provider value={value}>{children}</KpkContext.Provider>;
+  return (
+    <KpkContext.Provider value={value}>
+      <SessionSecondsProvider>{children}</SessionSecondsProvider>
+    </KpkContext.Provider>
+  );
+}
+
+// ── Session-seconds context: isolated 1s ticker so it does NOT re-render the main KpkProvider ──
+const SessionSecondsContext = createContext<number>(0);
+
+function SessionSecondsProvider({ children }: { children: ReactNode }) {
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <SessionSecondsContext.Provider value={seconds}>{children}</SessionSecondsContext.Provider>
+  );
+}
+
+export function useSessionSeconds() {
+  return useContext(SessionSecondsContext);
 }
 
 export function useKpk() {
