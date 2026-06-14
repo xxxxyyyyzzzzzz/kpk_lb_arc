@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScreenShell } from "./ScreenShell";
-import { useKpk, fmtClock, fmtSession } from "@/lib/kpkStore";
+import { useKpk, useSessionSeconds, fmtClock, fmtSession } from "@/lib/kpkStore";
 import { sfx } from "@/lib/sounds";
 
 const BOTS = [
