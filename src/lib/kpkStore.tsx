@@ -49,7 +49,6 @@ type KpkState = {
   // rounds
   round: 1 | 2 | 3 | 4;
   turn: number; // 1..TURNS_PER_NEWS_ROUND
-  sessionSeconds: number;
   turnSeconds: number;
   turnRunning: boolean;
 
