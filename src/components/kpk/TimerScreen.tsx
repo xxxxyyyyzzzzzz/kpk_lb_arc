@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScreenShell } from "./ScreenShell";
-import { useKpk, fmtClock, fmtSession } from "@/lib/kpkStore";
+import { useKpk, useSessionSeconds, fmtClock, fmtSession } from "@/lib/kpkStore";
 import { sfx } from "@/lib/sounds";
 
 const BOTS = [
@@ -13,7 +13,8 @@ const BOTS = [
 ];
 
 export function TimerScreen() {
-  const { user, round, turn, sessionSeconds, turnSeconds, turnRunning, toggleTurn, nextPlayer, ap, setAP } = useKpk();
+  const { user, round, turn, turnSeconds, turnRunning, toggleTurn, nextPlayer, ap, setAP } = useKpk();
+  const sessionSeconds = useSessionSeconds();
   const [openBot, setOpenBot] = useState<string | null>(null);
   const ending = turnSeconds <= 30;
 

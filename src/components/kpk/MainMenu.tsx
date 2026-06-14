@@ -1,4 +1,4 @@
-import { useKpk, fmtSession } from "@/lib/kpkStore";
+import { useKpk, useSessionSeconds, fmtSession } from "@/lib/kpkStore";
 import { FACTIONS } from "@/lib/kpkData";
 import { sfx } from "@/lib/sounds";
 
@@ -11,8 +11,9 @@ const MENU = [
 ] as const;
 
 export function MainMenu() {
-  const { user, logout, go, sessionSeconds, totalScore, level1, level2, level3, round, turn,
+  const { user, logout, go, totalScore, level1, level2, level3, round, turn,
     roomCode, players, isHost, playerId } = useKpk();
+  const sessionSeconds = useSessionSeconds();
   const factionColor = user ? FACTIONS[user.faction] : "#fff";
 
   return (
