@@ -30,20 +30,33 @@ export function useSession(roomCode: string | null): SessionState | null {
   const [snap, setSnap] = useState<SessionState | null>(() =>
     roomCode ? localSessions.get(roomCode) ?? null : null,
   );
+  const lastJsonRef = useRef<string>(JSON.stringify(roomCode ? localSessions.get(roomCode) ?? null : null));
 
   useEffect(() => {
-    if (!roomCode) { setSnap(null); return; }
+    if (!roomCode) {
+      if (lastJsonRef.current !== "null") {
+        lastJsonRef.current = "null";
+        setSnap(null);
+      }
+      return;
+    }
+    const apply = (v: SessionState | null) => {
+      const json = JSON.stringify(v ?? null);
+      if (json === lastJsonRef.current) return;
+      lastJsonRef.current = json;
+      setSnap(v);
+    };
     if (LOCAL_MODE) {
-      const set: Listener = (v) => setSnap(v);
+      const l: Listener = (v) => apply(v);
       if (!localListeners.has(roomCode)) localListeners.set(roomCode, new Set());
-      localListeners.get(roomCode)!.add(set);
-      setSnap(localSessions.get(roomCode) ?? null);
-      return () => { localListeners.get(roomCode)?.delete(set); };
+      localListeners.get(roomCode)!.add(l);
+      apply(localSessions.get(roomCode) ?? null);
+      return () => { localListeners.get(roomCode)?.delete(l); };
     }
     const fb = getFirebase();
     if (!fb) return;
     const r = ref(fb.db, `sessions/${roomCode}`);
-    const off = onValue(r, (snap) => setSnap((snap.val() as SessionState) ?? null));
+    const off = onValue(r, (snap) => apply((snap.val() as SessionState) ?? null));
     return () => off();
   }, [roomCode]);
 
