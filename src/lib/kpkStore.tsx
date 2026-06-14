@@ -133,18 +133,11 @@ export function KpkProvider({ children }: { children: ReactNode }) {
   const [prevScreen, setPrev] = useState<Screen | null>(null);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
-  const [sessionSeconds, setSS] = useState(0);
 
   const session = useSession(roomCode);
   const me: PlayerState | null = session && playerId ? session.players?.[playerId] ?? null : null;
 
   const warnRef = useRef(false);
-
-  // session timer
-  useEffect(() => {
-    const id = setInterval(() => setSS((s) => s + 1), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   // ── HOST ENGINE: drive turn timer & news rounds for everyone ──
   const isHost = !!session && !!playerId && session.host_id === playerId;
