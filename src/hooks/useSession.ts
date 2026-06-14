@@ -1,6 +1,6 @@
 // Realtime sync hook: listens to /sessions/{roomCode} and returns the latest snapshot.
 // Falls back to a tiny in-memory pub/sub when Firebase is not configured (LOCAL_MODE).
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { onValue, ref, set, get, update, runTransaction } from "firebase/database";
 import { getFirebase, LOCAL_MODE } from "@/lib/firebase";
 import type { SessionState } from "@/lib/sessionSchema";
